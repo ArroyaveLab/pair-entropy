@@ -10,7 +10,7 @@ where x_i is the site fraction of species i, y_ij the fraction of bonds with i a
 
 Together with the vibrational entropy from the velocity autocorrelation function, the package gives the excess entropy of the liquid,
 
-    S_ex = S_vib,ex + S_chem,ex     (J/mol-atom/K; electronic term reported as missing),
+    S_ex = S_vib,ex + S_chem,ex     (J/mol-atom/K; excess electronic entropy taken as zero),
 
 with block standard errors, the spread over neighbour cutoffs, a label-permutation (ideal-mixing) check and, optionally, the Redlich–Kister b_k parameters of L_k = a_k + b_k T.
 

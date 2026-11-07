@@ -104,8 +104,8 @@ def excess_entropy(alloys: dict, references: dict, T: float, dt_fs: float, cutof
     """Excess entropy of alloy liquids, J/mol-atom/K.
 
     alloys: {name: Trajectory}; references: {species: Trajectory of the pure liquid}; T: temperature (K) of every
-    state; dt_fs: time between frames. S_ex = S_vib,ex + S_chem,ex; the electronic term is not computed and is
-    reported as missing. Excess entropies are marked as held when the label-permutation check of any alloy exceeds
+    state; dt_fs: time between frames. S_ex = S_vib,ex + S_chem,ex; the excess electronic entropy is taken as
+    zero (metallic liquids), an assumption stated in the result. Excess entropies are marked as held when the label-permutation check of any alloy exceeds
     ``ideal_tol``.
     """
     species = sorted(references)
@@ -157,7 +157,7 @@ def excess_entropy(alloys: dict, references: dict, T: float, dt_fs: float, cutof
                             **ch,
                             "S_excess": float(vex + ch["S_chem_excess"]),
                             "S_excess_u": float(np.hypot(vse, ch["S_chem_excess_u"])),
-                            "S_electronic_excess": None,
+                            "S_electronic_excess": 0.0,
                             "dos_integral_per_atom": v["dos_integral_per_atom"],
                             "negative_dos_weight_per_atom": v["negative_dos_weight_per_atom"]}
     for r in out_alloys.values():
@@ -191,7 +191,7 @@ def excess_entropy(alloys: dict, references: dict, T: float, dt_fs: float, cutof
             "references": {s: {"source": references[s].source, **rv[s], "T_kinetic_K": tkin[f"ref:{s}"],
                                "N": references[s].natoms, "frames": references[s].nframes} for s in species},
             "alloys": out_alloys, "redlich_kister": rk,
-            "missing_terms": {"electronic": "not computed (unknown, not zero)"},
+            "assumptions": {"electronic": "excess electronic entropy taken as zero (metallic liquids)"},
             "uncertainty": "S_chem,ex u = quadrature(block SE, largest cutoff-case change); S_vib,ex SE = quadrature "
                            "of the block SEs of the alloy and the x-weighted references; covariance from shared "
                            "references; potential and method errors not included",

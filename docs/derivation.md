@@ -2,7 +2,7 @@
 
 ## Setting
 
-In the method of Hong and Liu [1], the entropy of a liquid simulated by molecular dynamics is separated into a vibrational part, obtained from the velocity autocorrelation function, and a configurational part that accounts for the arrangement of the chemical species. The configurational part can be expressed as the entropy of the species labels on the neighbour graph of the simulation, in which two atoms are connected when their distance is smaller than the first minimum of the corresponding partial radial distribution function. Whatever the estimator, this entropy has a known limit: when the labels are distributed at random over the sites of the graph, it must reduce to the ideal entropy of mixing, -R Σ_i x_i ln x_i, independently of the structure of the graph. The package replaces the chemical-mixing term of Hong and Liu [1] with the pair approximation described below, which satisfies this limit exactly.
+In the method of Hong and Liu [1], the entropy of a liquid simulated by molecular dynamics is separated into a vibrational part, obtained from the velocity autocorrelation function, and a configurational part that accounts for the arrangement of the chemical species. The configurational part can be expressed as the entropy of the species labels on the neighbour graph of the simulation, in which two atoms are connected when their distance is smaller than the first minimum of the corresponding partial radial distribution function. Whatever the estimator, this entropy has a known limit. When the labels are distributed at random over the sites of the graph, it must reduce to the ideal entropy of mixing, -R Σ_i x_i ln x_i, independently of the structure of the graph. In this package, the chemical-mixing term of Hong and Liu [1] is replaced with the pair approximation described below, which satisfies this limit exactly.
 
 ## The estimator
 
@@ -14,33 +14,29 @@ where H denotes the Shannon entropy, x_i the fraction of species i and y_ij the 
 
     S_chem / R = -Σ_i x_i ln x_i - (z̄/2) Σ_ij y_ij ln[ y_ij / (w_i w_j) ].
 
-The second term is -(z̄/2) times the mutual information I of the species at the two ends of a bond,
+The second term of this expression is -(z̄/2) times the mutual information of the species at the two ends of a bond,
 
     I = Σ_ij y_ij ln[ y_ij / (w_i w_j) ] ≥ 0,
 
-so that the excess chemical entropy is
+so that the excess chemical entropy is simply
 
     S_chem,ex = S_chem - S_ideal = -R (z̄/2) I.
 
-On a lattice, w_i = x_i and Σ_j y_ij = x_i, and the identity H(y) = 2 H(x) - I turns the lattice form above into the expression for S_chem with z̄ = z.
+On a lattice, where w_i = x_i, the identity H(y) = 2 H(x) - I turns the lattice form above into the expression for S_chem with z̄ = z, and the two forms are therefore equivalent.
 
 ## Properties
 
-This form has three properties that make it suitable as an estimator.
+This form has three properties that make it suitable as an estimator. In the first place, the bond fractions of random labels on any graph are the products of the bond-end fractions, y_ij = w_i w_j, so that the mutual information vanishes and the entropy reduces exactly to the ideal entropy of mixing, whatever the distribution of the coordination in the graph. Since the mutual information cannot be negative, any chemical order, whether ordering (Warren–Cowley α < 0) or clustering (α > 0), lowers the entropy below this ideal value. Finally, the expression is exact for the quasi-chemical distribution on a Bethe lattice and for a one-dimensional Markov chain (z = 2), while in other cases (for instance, on lattices with loops) it remains an approximation, the quality of which is tested below.
 
-1. **Ideal limit.** For random labels on any graph, y_ij = w_i w_j, so that I = 0 and the entropy reduces exactly to the ideal entropy of mixing. Ideal mixing therefore enters exactly once, whatever the coordination distribution of the graph.
-2. **Sign.** Since I ≥ 0, any chemical order, whether ordering (Warren–Cowley α < 0) or clustering (α > 0), lowers the entropy below the ideal value.
-3. **Exact cases.** The expression is exact for the quasi-chemical distribution on a Bethe lattice and for a one-dimensional Markov chain (z = 2). In other cases, for instance on lattices with loops, it remains an approximation.
-
-For a binary A–B with site fraction x_B and Warren–Cowley parameter α on a lattice, the bond fractions are y_AB = y_BA = x_A x_B (1 - α), y_AA = x_A - y_AB and y_BB = x_B - y_AB (`pair_entropy.bethe_quasichemical`).
+For a binary A–B with site fraction x_B and Warren–Cowley parameter α on a lattice, the bond fractions are y_AB = y_BA = x_A x_B (1 - α), y_AA = x_A - y_AB and y_BB = x_B - y_AB, and this distribution is implemented in `pair_entropy.bethe_quasichemical`.
 
 ### Why the bond-end fractions
 
-In a liquid, the species of an atom and its number of neighbours are correlated (a large atom has more neighbours than a small one). If the bond statistics were referred to the site fractions x_i, rather than to the bond-end fractions w_i, this coupling between species and coordination would be counted as chemical order, and random labels would not give the ideal entropy of mixing. The x_i-referenced form is still reported (`S_chem_excess_x_reference_variant`) as a sensitivity case.
+In a liquid, the species of an atom and its number of neighbours are correlated, since a large atom has, on average, more neighbours than a small one. If the bond statistics were referred to the site fractions x_i rather than to the bond-end fractions w_i, this coupling between species and coordination would be counted as chemical order, and random labels would then not give the ideal entropy of mixing. The form referred to x_i is nevertheless reported (`S_chem_excess_x_reference_variant`) as a measure of the sensitivity of the result to this choice.
 
 ## Tests of the formalism
 
-The test suite checks each of these statements against results obtained independently of the pair formula.
+Each of the statements above is checked in the test suite against results that are obtained independently of the pair formula.
 
 | Case | Exact result | Test |
 |---|---|---|
@@ -56,27 +52,23 @@ The test suite checks each of these statements against results obtained independ
 
 ## From molecular dynamics to the excess entropy
 
-**Neighbour graph.** For every frame, two atoms of species i and j are neighbours when they are closer than r_c,ij, the first minimum (after the first peak) of the partial radial distribution function g_ij(r), computed from the same trajectory (default). The first minimum of the total radial distribution function, or a fixed cutoff, can be used instead. Bond counts y_ij, site counts and coordinations are pooled over the frames.
+The neighbour graph is built for every frame of the simulation. By default, two atoms of species i and j are considered neighbours when they are closer than r_c,ij, the first minimum (after the first peak) of the partial radial distribution function g_ij(r) computed from the same trajectory, although the first minimum of the total radial distribution function or a fixed cutoff can be used instead. The bond counts y_ij, the site counts and the coordinations are then pooled over all the frames.
 
-**Label-permutation check.** Before an excess entropy is accepted, the species labels of each alloy are permuted at random on every neighbour graph of the simulation, which is kept as built with the true labels. The pair estimator must then give |S_chem,ex| below a tolerance (default 0.05 J/mol/K); otherwise the results are marked as held.
+Before an excess entropy is accepted, the species labels of each alloy are permuted at random on every neighbour graph of the simulation, which is kept as it was built with the true labels. For these permuted labels, the pair estimator must give an excess chemical entropy below a tolerance (by default, 0.05 J/mol/K in absolute value), and the results of a state that fails this check are marked as held. The uncertainty of the chemical term combines, in quadrature, the block standard error over `nblock` consecutive blocks of frames and the spread due to the choice of cutoff, that is, the largest change of S_chem,ex over the cutoff cases (the base cutoff, the base cutoff ∓ 0.1 Å and the other convention for the radial distribution function).
 
-**Uncertainty of the chemical term.** The block standard error over `nblock` consecutive blocks of frames is combined in quadrature with the cutoff spread, the largest change of S_chem,ex over the cutoff cases (base, base ∓ 0.1 Å, and the other radial-distribution-function convention).
-
-**Vibrational term.** The mass-weighted velocity autocorrelation function of each state is multiplied by a Hann window of length t_max (default 3 ps) and cosine-transformed to a vibrational density of states g(ν), normalised to 3N, which is converted with the quantum harmonic entropy per mode,
+The vibrational term is obtained from the mass-weighted velocity autocorrelation function of each state. This function is multiplied by a Hann window of length t_max (3 ps by default) and cosine-transformed to a vibrational density of states g(ν), normalised to 3N, which is then converted to an entropy with the quantum harmonic entropy of each mode,
 
     S_vib = R ∫ g(ν) [ u coth u - ln(2 sinh u) ] dν,   u = hν / (2 k_B T).
 
-S_vib,ex is the alloy value minus the composition-weighted values of the pure liquids at the same temperature, with block standard errors.
-
-**Excess entropy.** Per mole of atoms,
+The excess vibrational entropy S_vib,ex is the value of the alloy minus the composition-weighted values of the pure liquids at the same temperature, with block standard errors, and the excess entropy per mole of atoms is the sum of the two terms,
 
     S_ex = S_vib,ex + S_chem,ex.
 
-The electronic term is not computed and is reported as missing, not as zero. For use in a CALPHAD assessment, the excess entropies of several compositions can be fitted, with the covariance introduced by the shared pure-liquid references, to the temperature derivative of a Redlich–Kister excess with L_k = a_k + b_k T,
+The excess electronic entropy, which is expected to be small in metallic liquids, is taken as zero, and this assumption is stated with every result. For use in a CALPHAD assessment, the excess entropies at several compositions can be fitted to the temperature derivative of a Redlich–Kister excess Gibbs energy with L_k = a_k + b_k T, taking into account the covariance introduced by the shared pure-liquid references,
 
     S_ex = -Σ_{i<j} x_i x_j Σ_k b_k^{ij} (x_i - x_j)^k,
 
-which for a binary with x = x_B reads S_ex = -x (1 - x) Σ_k b_k (1 - 2x)^k.
+which, for a binary with x = x_B, reduces to S_ex = -x (1 - x) Σ_k b_k (1 - 2x)^k.
 
 ## References
 

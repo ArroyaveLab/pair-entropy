@@ -172,7 +172,7 @@ def test_excess_entropy_binary(cuni):
     assert a["T_kinetic_K"] == pytest.approx(T, rel=0.05)
     fit = out["redlich_kister"]["fit"]
     assert fit["order"] == 0 and fit["b"][0] == pytest.approx(-a["S_excess"] / 0.25, rel=1e-9)
-    assert out["missing_terms"]["electronic"].startswith("not computed")
+    assert out["assumptions"]["electronic"].startswith("excess electronic entropy taken as zero")
     held = pe.excess_entropy(alloys, refs, T, DT, rc=RC_GAP, tmax_ps=0.5, stride=5, ideal_tol=1e-12)
     assert not held["permutation_check"]["passed"]
     assert held["alloys"]["CuNi"]["status"].startswith("held")
