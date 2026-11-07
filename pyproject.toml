@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pair-entropy"
+version = "0.1.0"
+description = "Pair (quasi-chemical) estimator of the chemical-mixing entropy of alloy liquids from molecular dynamics"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Raymundo Arróyave", email = "rarroyave@tamu.edu" }]
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.22", "ase>=3.22"]
+keywords = ["entropy", "liquid", "molecular dynamics", "quasi-chemical", "CALPHAD", "short-range order"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7"]
+
+[project.scripts]
+pair-entropy = "pair_entropy.cli:main"
+
+[project.urls]
+Repository = "https://github.com/ArroyaveLab/pair-entropy"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

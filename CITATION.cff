@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below, together with Hong and Liu (2025)."
+title: "pair-entropy: Pair (quasi-chemical) estimator of the excess entropy of liquids from molecular dynamics"
+type: software
+authors:
+  - family-names: "Arróyave"
+    given-names: "Raymundo"
+    orcid: "https://orcid.org/0000-0001-7548-8686"
+    affiliation: "Texas A&M University"
+version: "0.1.0"
+license: MIT
+repository-code: "https://github.com/ArroyaveLab/pair-entropy"
+keywords:
+  - entropy
+  - liquid
+  - molecular dynamics
+  - quasi-chemical approximation
+  - CALPHAD
+references:
+  - type: article
+    authors:
+      - family-names: "Hong"
+        given-names: "Qi-Jun"
+      - family-names: "Liu"
+        given-names: "Zi-Kui"
+    title: "Generalized approach for rapid entropy calculation of liquids and solids"
+    journal: "Physical Review Research"
+    volume: 7
+    start: "L012030"
+    year: 2025
+    doi: "10.1103/PhysRevResearch.7.L012030"
